@@ -59,7 +59,6 @@ public class SamplesControllerTest {
 	private GenomeAssemblyService genomeAssemblyService;
 	private MessageSource messageSource;
 
-
 	@Before
 	public void setUp() {
 		sampleService = mock(SampleService.class);
