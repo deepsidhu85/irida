@@ -18,7 +18,14 @@ import javax.persistence.EntityManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import ca.corefacility.bioinformatics.irida.config.services.IridaApiServicesConfig;
+import ca.corefacility.bioinformatics.irida.model.sequenceFile.LocalSequenceFile;
 import ca.corefacility.bioinformatics.irida.model.sequenceFile.SequenceFile;
 import ca.corefacility.bioinformatics.irida.repositories.sequencefile.SequenceFileRepositoryImpl;
 import ca.corefacility.bioinformatics.irida.util.RecursiveDeleteVisitor;
@@ -27,6 +34,9 @@ import ca.corefacility.bioinformatics.irida.util.RecursiveDeleteVisitor;
  * Tests for {@link FilesystemSupplementedRepositoryImpl}.
  * 
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { IridaApiServicesConfig.class })
+@ActiveProfiles("it")
 public class SequenceFileRepositoryImplTest {
 
 	private static final String TEMP_FILE_PREFIX = UUID.randomUUID().toString().replaceAll("-", "");
@@ -34,11 +44,14 @@ public class SequenceFileRepositoryImplTest {
 	private Path baseDirectory;
 	private EntityManager entityManager;
 
+	@Autowired
+	private IridaFileStorageService iridaFileStorageService;
+
 	@Before
 	public void setUp() throws IOException {
 		baseDirectory = Files.createTempDirectory(TEMP_FILE_PREFIX);
 		entityManager = mock(EntityManager.class);
-		repository = new SequenceFileRepositoryImpl(entityManager, baseDirectory);
+		repository = new SequenceFileRepositoryImpl(entityManager, baseDirectory, iridaFileStorageService);
 	}
 
 	@After
@@ -52,7 +65,7 @@ public class SequenceFileRepositoryImplTest {
 
 	@Test
 	public void testCreateFileMissingIdentifier() throws IOException {
-		SequenceFile s = new SequenceFile(getTempFile());
+		SequenceFile s = new LocalSequenceFile(getTempFile());
 		try {
 			repository.save(s);
 			fail();
@@ -67,7 +80,7 @@ public class SequenceFileRepositoryImplTest {
 		Long lid = new Long(1111);
 		Path f = getTempFile();
 		String filename = f.getFileName().toString();
-		SequenceFile s = new SequenceFile(f);
+		SequenceFile s = new LocalSequenceFile(f);
 		s.setId(lid);
 		when(entityManager.find(SequenceFile.class, lid)).thenReturn(s);
 		when(entityManager.merge(s)).thenReturn(s);
@@ -84,7 +97,7 @@ public class SequenceFileRepositoryImplTest {
 
 	@Test
 	public void testUpdateFileMissingIdentifier() throws IOException {
-		SequenceFile s = new SequenceFile(getTempFile());
+		SequenceFile s = new LocalSequenceFile(getTempFile());
 		try {
 			repository.save(s);
 			fail();
@@ -97,7 +110,7 @@ public class SequenceFileRepositoryImplTest {
 	@Test
 	public void testUpdateMissingDirectory() throws IOException {
 		Path f = getTempFile();
-		SequenceFile s = new SequenceFile(f);
+		SequenceFile s = new LocalSequenceFile(f);
 
 		try {
 			repository.save(s);
@@ -115,7 +128,7 @@ public class SequenceFileRepositoryImplTest {
 		Long lid = new Long(1111);
 		Path oldFile = getTempFile();
 		Files.write(oldFile, originalText.getBytes());
-		SequenceFile sf = new SequenceFile(oldFile);
+		SequenceFile sf = new LocalSequenceFile(oldFile);
 		sf.setId(lid);
 		// create the directory and put the file into it.
 		// so call create instead of rewriting the logic:
@@ -158,7 +171,7 @@ public class SequenceFileRepositoryImplTest {
 	public void testUpdate() throws IOException {
 		Long lId = new Long(9999);
 		Path originalFile = getTempFile();
-		SequenceFile original = new SequenceFile(originalFile);
+		SequenceFile original = new LocalSequenceFile(originalFile);
 		original.setId(lId);
 		when(entityManager.find(SequenceFile.class, lId)).thenReturn(original);
 		when(entityManager.merge(original)).thenReturn(original);
