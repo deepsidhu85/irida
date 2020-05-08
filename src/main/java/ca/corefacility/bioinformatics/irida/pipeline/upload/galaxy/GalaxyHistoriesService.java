@@ -6,16 +6,18 @@ import static com.google.common.base.Preconditions.checkState;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import org.checkerframework.checker.units.qual.A;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ReactiveHttpOutputMessage;
+import org.springframework.web.reactive.function.BodyInserter;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import ca.corefacility.bioinformatics.irida.exceptions.ExecutionManagerDownloadException;
 import ca.corefacility.bioinformatics.irida.exceptions.ExecutionManagerException;
@@ -30,6 +32,7 @@ import ca.corefacility.bioinformatics.irida.model.workflow.execution.InputFileTy
 import ca.corefacility.bioinformatics.irida.model.workflow.execution.galaxy.GalaxyWorkflowStatus;
 import ca.corefacility.bioinformatics.irida.pipeline.upload.DataStorage;
 import ca.corefacility.bioinformatics.irida.repositories.filesystem.IridaFileStorageService;
+import ca.corefacility.bioinformatics.irida.ria.web.dto.GalaxyCloud;
 
 import com.github.jmchilton.blend4j.galaxy.HistoriesClient;
 import com.github.jmchilton.blend4j.galaxy.ToolsClient;
@@ -48,6 +51,7 @@ import com.github.jmchilton.blend4j.galaxy.beans.collection.response.CollectionR
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import reactor.core.publisher.Mono;
 
 /**
  * Class for working with Galaxy Histories.
@@ -200,9 +204,28 @@ public class GalaxyHistoriesService {
 		checkNotNull(paths, "paths is null");
 
 		Map<Path, String> datasetIdsMap = new HashMap<>();
+		Map<Path, String> datasetLibraryIdsMap = new HashMap<>();
 
-		Map<Path, String> datasetLibraryIdsMap = librariesService
-				.filesToLibraryWait(paths, library, dataStorage);
+		if(DataStorage.REMOTE.equals(dataStorage)) {
+			ArrayList<String> c = new ArrayList<>();
+
+			for (Path p : paths) {
+				c.add(p.toString());
+			}
+
+			GalaxyCloud a = new GalaxyCloud(history.getId(), "", "irida-nml", c);
+
+			WebClient client2 = WebClient.create("http://localhost:48888");
+
+			WebClient.ResponseSpec response1 = client2.post()
+					.uri("/api/cloud/storage/get")
+					.body(BodyInserters.fromValue(a)).retrieve();
+
+			logger.debug(response1.bodyToMono(String.class).toString());
+
+		} else {
+			datasetLibraryIdsMap = librariesService.filesToLibraryWait(paths, library, dataStorage);
+		}
 
 		if (datasetLibraryIdsMap.size() != paths.size()) {
 			throw new UploadException(
