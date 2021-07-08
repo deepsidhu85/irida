@@ -58,7 +58,7 @@ export default function ProjectDetails({ projectId }) {
     : [
         {
           title: i18n("ProjectDetails.label"),
-          desc: project.canManage ? (
+          desc: project.canManageRemote ? (
             <Paragraph
               className="t-project-name"
               editable={{ onChange: (value) => updateField("label", value) }}
@@ -71,7 +71,7 @@ export default function ProjectDetails({ projectId }) {
         },
         {
           title: i18n("ProjectDetails.description"),
-          desc: project.canManage ? (
+          desc: project.canManageRemote ? (
             <Paragraph
               className="t-project-desc"
               editable={{
@@ -90,7 +90,7 @@ export default function ProjectDetails({ projectId }) {
         },
         {
           title: i18n("ProjectDetails.organism"),
-          desc: project.canManage ? (
+          desc: project.canManageRemote ? (
             <EditableParagraph
               value={project.organism}
               valueClassName="t-project-organism"

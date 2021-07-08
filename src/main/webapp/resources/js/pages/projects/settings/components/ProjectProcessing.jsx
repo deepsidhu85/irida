@@ -18,12 +18,12 @@ export default function ProjectProcessing({ projectId }) {
       <Space style={{ width: `100%` }} direction="vertical">
         <ProcessingCoverage
           projectId={projectId}
-          canManage={project.canManage}
+          canManage={project.canManageRemote}
         />
         <Divider />
         <ProcessingAutomatedPipelines
           projectId={projectId}
-          canManage={project.canManage}
+          canManage={project.canManageRemote}
         />
       </Space>
     </>

@@ -45,7 +45,7 @@ export default function MetadataFields({ projectId }) {
 
   return (
     <Space direction="vertical" style={{ display: "block" }}>
-      {project.canManage && (
+      {project.canManageRemote && (
         <Space>
           <MetadataTemplateCreate fields={selectedFields} projectId={projectId}>
             <Button
@@ -62,7 +62,7 @@ export default function MetadataFields({ projectId }) {
         pagination={false}
         rowClassName={() => `t-m-field`}
         rowSelection={
-          project.canManage
+          project.canManageRemote
             ? { selectedRowKeys: selected, onChange: setSelected }
             : false
         }

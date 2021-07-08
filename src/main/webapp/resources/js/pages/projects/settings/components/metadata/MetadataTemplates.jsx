@@ -117,7 +117,7 @@ export default function MetadataTemplates({ projectId }) {
         {i18n("MetadataTemplates.download")}
       </Button>,
     ];
-    if (project.canManage) {
+    if (project.canManageRemote) {
       actions.push(
         <Tooltip
           placement="topLeft"
@@ -216,7 +216,7 @@ export default function MetadataTemplates({ projectId }) {
                       </Text>
                     )}
                     <div>
-                      {project.canManage &&
+                      {project.canManageRemote &&
                         (item.identifier ==
                         project.defaultMetadataTemplateId ? (
                           <Tag

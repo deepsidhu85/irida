@@ -63,7 +63,7 @@ export default function ViewAssociatedProjects({ projectId }) {
   }
 
   const columns = [
-    project.canManage
+    project.canManageRemote
       ? {
           key: "switch",
           width: 80,

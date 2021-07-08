@@ -106,7 +106,7 @@ const ProjectSettings = (props) => {
                     <MetadataLayout path="/metadata">
                       <MetadataFields path="/fields" />
                       <MetadataTemplates path="/templates" />
-                      {project.canManage ? (
+                      {project.canManageRemote ? (
                         <MetadataTemplateManager path="/templates/:id" />
                       ) : (
                         <MetadataTemplateMember path="/templates/:id" />

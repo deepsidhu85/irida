@@ -89,7 +89,7 @@ export default function ReferenceFiles({ projectId }) {
             }
           />,
           // Only display remove button for reference files if user can manage project
-          project.canManage ? (
+          project.canManageRemote ? (
             <RemoveTableItemButton
               key={`remove-btn-${file.id}`}
               onRemove={() => removeProjectReferenceFile(projectId, file.id)}
@@ -182,7 +182,7 @@ export default function ReferenceFiles({ projectId }) {
     <>
       <Title level={2}>{i18n("ReferenceFile.title")}</Title>
       <Space direction="vertical" style={{ width: `100%` }}>
-        {project.canManage ? (
+        {project.canManageRemote ? (
           <DragUpload
             options={referenceFileUploadOptions}
             uploadText={i18n("ReferenceFile.clickorDrag")}
@@ -201,8 +201,8 @@ export default function ReferenceFiles({ projectId }) {
           />
         ) : (
           <InfoAlert
-            message={alertMessage[project.canManage].text}
-            className={alertMessage[project.canManage].alertClass}
+            message={alertMessage[project.canManageRemote].text}
+            className={alertMessage[project.canManageRemote].alertClass}
           />
         )}
       </Space>

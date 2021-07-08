@@ -182,7 +182,7 @@ public class ProjectServiceImpl extends CRUDServiceImpl<Long, Project> implement
 	 */
 	@Override
 	@Transactional
-	@PreAuthorize("hasPermission(#object, 'isProjectOwner')")
+	@PreAuthorize("hasPermission(#object, 'canManageLocalProjectSettings')")
 	public Project update(Project object) {
 		return super.update(object);
 	}
@@ -586,7 +586,7 @@ public class ProjectServiceImpl extends CRUDServiceImpl<Long, Project> implement
 	 */
 	@Override
 	@Transactional
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasPermission(#project, 'isProjectOwner')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasPermission(#project, 'canManageLocalProjectSettings')")
 	public Join<Project, ReferenceFile> addReferenceFileToProject(Project project, ReferenceFile referenceFile) {
 		referenceFile = referenceFileRepository.save(referenceFile);
 		ProjectReferenceFileJoin j = new ProjectReferenceFileJoin(project, referenceFile);
@@ -597,7 +597,7 @@ public class ProjectServiceImpl extends CRUDServiceImpl<Long, Project> implement
 	 * {@inheritDoc}
 	 */
 	@Override
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasPermission(#project, 'isProjectOwner')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasPermission(#project, 'canManageLocalProjectSettings')")
 	public void removeReferenceFileFromProject(Project project, ReferenceFile file) {
 		List<Join<Project, ReferenceFile>> referenceFilesForProject = prfjRepository.findReferenceFilesForProject(
 				project);
